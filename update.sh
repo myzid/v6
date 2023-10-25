@@ -4,4 +4,6 @@ unzip menu.zip
 chmod +x menu/*
 mv menu/* /usr/local/sbin
 rm -rf menu.zip
+rm -rf menu
+rm -rf update.sh
 menu
